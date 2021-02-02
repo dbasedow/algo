@@ -15,7 +15,6 @@
       recurse: yes
       mode: '0700'
     with_items:
-      - ecparams
       - certs
       - crl
       - newcerts
@@ -52,9 +51,8 @@
   - name: Build the CA pair
     shell: >
       umask 077;
-      {{ openssl_bin }} ecparam -name secp384r1 -out ecparams/secp384r1.pem &&
       {{ openssl_bin }} req -utf8 -new
-      -newkey ec:ecparams/secp384r1.pem
+      -newkey rsa:4096
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName={{ subjectAltName }}"))
       -keyout private/cakey.pem
       -out cacert.pem -x509 -days 3650
@@ -81,7 +79,7 @@
     shell: >
       umask 077;
       {{ openssl_bin }} req -utf8 -new
-      -newkey ec:ecparams/secp384r1.pem
+      -newkey rsa:4096
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName={{ subjectAltName }}"))
       -keyout private/{{ IP_subject_alt_name }}.key
       -out reqs/{{ IP_subject_alt_name }}.req -nodes
@@ -104,7 +102,7 @@
     shell: >
       umask 077;
       {{ openssl_bin }} req -utf8 -new
-      -newkey ec:ecparams/secp384r1.pem
+      -newkey rsa:4096
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName={{ subjectAltName_USER }}"))
       -keyout private/{{ item }}.key
       -out reqs/{{ item }}.req -nodes
@@ -128,7 +126,7 @@
     shell: >
       umask 077;
       {{ openssl_bin }} req -utf8 -new
-      -newkey ec:ecparams/secp384r1.pem
+      -newkey rsa:4096
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName=DNS:google-algo-test-pair.com"))
       -keyout private/google-algo-test-pair.com.key
       -out reqs/google-algo-test-pair.com.req -nodes
